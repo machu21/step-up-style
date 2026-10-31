@@ -10,6 +10,8 @@ const SHOP_LINKS = [
   ["Men", "/shop?gender=Men"],
   ["Women", "/shop?gender=Women"],
   ["Basketball", "/shop?category=Basketball"],
+  ["Track Order", "/track"],
+  ["My Orders", "/orders"],
 ] as const;
 
 const COLUMNS = [

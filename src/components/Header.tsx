@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Menu, Package, Search, ShoppingBag, X } from "lucide-react";
 import { products, peso } from "@/lib/products";
 import { selectCount, useCart, useUi } from "@/store/cart";
 import { Logo } from "./Logo";
@@ -62,6 +62,9 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1">
+          <Link href="/orders" className="rounded-full p-2.5 hover:bg-ink/5" aria-label="My orders" title="My orders">
+            <Package size={20} />
+          </Link>
           <button
             onClick={() => setSearchOpen((v) => !v)}
             className="rounded-full p-2.5 hover:bg-ink/5"

@@ -7,9 +7,10 @@ import { Banknote, CheckCircle2, CreditCard, Loader2, Lock, Wallet } from "lucid
 import { CheckoutHeader } from "@/components/Header";
 import { FREE_SHIPPING, peso, SHIPPING, TAX_RATE, type ShippingMethod } from "@/lib/products";
 import { selectSubtotal, useCart, type CartItem } from "@/store/cart";
+import { useOrders } from "@/store/orders";
+import type { Payment } from "@/lib/orderStatus";
 
-type Payment = "card" | "cod" | "wallet";
-type Fields = { fullName: string; email: string; address: string; city: string; postal: string; cardNumber: string; expiry: string; cvc: string };
+type Fields = { fullName: string; email: string; phone: string; address: string; city: string; postal: string; cardNumber: string; expiry: string; cvc: string };
 type Errors = Partial<Record<keyof Fields, string>>;
 
 const PAYMENTS: { id: Payment; label: string; icon: typeof CreditCard }[] = [
@@ -22,6 +23,7 @@ function validate(f: Fields, payment: Payment): Errors {
   const e: Errors = {};
   if (f.fullName.trim().length < 2) e.fullName = "Enter your full name";
   if (!/^\S+@\S+\.\S+$/.test(f.email)) e.email = "Enter a valid email";
+  if (!/^(09|\+639)\d{9}$/.test(f.phone.replace(/[\s-]/g, ""))) e.phone = "Enter a PH mobile number (09XX XXX XXXX)";
   if (f.address.trim().length < 5) e.address = "Enter your street address";
   if (f.city.trim().length < 2) e.city = "Enter your city";
   if (!/^\d{4}$/.test(f.postal.trim())) e.postal = "Postal code must be 4 digits";
@@ -54,12 +56,13 @@ export default function CheckoutPage() {
   const items = useCart((s) => s.items);
   const subtotal = useCart(selectSubtotal);
   const clear = useCart((s) => s.clear);
+  const placeOrder = useOrders((s) => s.place);
   const hydrated = useSyncExternalStore(
     (cb) => useCart.persist.onFinishHydration(cb),
     () => useCart.persist.hasHydrated(),
     () => false,
   );
-  const [fields, setFields] = useState<Fields>({ fullName: "", email: "", address: "", city: "", postal: "", cardNumber: "", expiry: "", cvc: "" });
+  const [fields, setFields] = useState<Fields>({ fullName: "", email: "", phone: "", address: "", city: "", postal: "", cardNumber: "", expiry: "", cvc: "" });
   const [errors, setErrors] = useState<Errors>({});
   const [shipping, setShipping] = useState<ShippingMethod>("standard");
   const [payment, setPayment] = useState<Payment>("card");
@@ -85,7 +88,17 @@ export default function CheckoutPage() {
     }
     setSubmitting(true);
     setTimeout(() => {
-      setOrder({ id: `SUS-${Math.floor(1000 + Math.random() * 9000)}`, items, total, email: fields.email });
+      const placed = placeOrder({
+        customer: { name: fields.fullName.trim(), email: fields.email.trim(), phone: fields.phone.trim(), address: fields.address.trim(), city: fields.city.trim(), postal: fields.postal.trim() },
+        items,
+        subtotal,
+        shippingFee,
+        tax,
+        total,
+        shippingMethod: shipping,
+        payment,
+      });
+      setOrder({ id: placed.id, items, total, email: fields.email });
       clear();
       setSubmitting(false);
       window.scrollTo({ top: 0 });
@@ -98,7 +111,7 @@ export default function CheckoutPage() {
         <CheckoutHeader />
         <main className="mx-auto flex max-w-xl flex-1 flex-col items-center px-4 py-20 text-center">
           <CheckCircle2 size={64} className="animate-pop-in text-olive" />
-          <h1 className="display mt-6 text-5xl sm:text-6xl">Order #{order.id} Placed</h1>
+          <h1 className="display mt-6 text-5xl sm:text-6xl">Order {order.id} Placed</h1>
           <p className="mt-4 text-muted">
             Thanks! A confirmation was sent to <strong className="text-ink">{order.email}</strong>. We’ll notify you when it ships.
           </p>
@@ -110,11 +123,16 @@ export default function CheckoutPage() {
                 <span className="text-sm font-semibold">{peso(i.price * i.quantity)}</span>
               </li>
             ))}
-            <li className="flex justify-between pt-3 font-bold"><span>Total paid</span><span>{peso(order.total)}</span></li>
+            <li className="flex justify-between pt-3 font-bold"><span>Order total</span><span>{peso(order.total)}</span></li>
           </ul>
-          <Link href="/" className="mt-8 rounded-full bg-ink px-8 py-4 text-sm font-semibold text-cream hover:bg-ember">
-            Continue shopping
-          </Link>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link href={`/track?id=${order.id}`} className="rounded-full bg-ink px-8 py-4 text-sm font-semibold text-cream hover:bg-ember">
+              Track your order
+            </Link>
+            <Link href="/" className="rounded-full border border-ink/15 px-8 py-4 text-sm font-semibold hover:border-ink">
+              Continue shopping
+            </Link>
+          </div>
         </main>
       </>
     );
@@ -154,6 +172,7 @@ export default function CheckoutPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Full name" name="fullName" value={fields.fullName} error={errors.fullName} onChange={onChange} autoComplete="name" />
                 <Field label="Email" name="email" type="email" value={fields.email} error={errors.email} onChange={onChange} autoComplete="email" />
+                <Field label="Mobile number" name="phone" type="tel" inputMode="tel" placeholder="0917 123 4567" value={fields.phone} error={errors.phone} onChange={onChange} autoComplete="tel" className="sm:col-span-2" />
                 <Field label="Address" name="address" value={fields.address} error={errors.address} onChange={onChange} autoComplete="street-address" className="sm:col-span-2" />
                 <Field label="City" name="city" value={fields.city} error={errors.city} onChange={onChange} autoComplete="address-level2" />
                 <Field label="Postal code" name="postal" inputMode="numeric" maxLength={4} value={fields.postal} error={errors.postal} onChange={onChange} autoComplete="postal-code" />
