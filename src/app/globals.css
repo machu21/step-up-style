@@ -36,3 +36,5 @@ body {
 .animate-slide-in { animation: slide-in .35s cubic-bezier(.2,.8,.2,1); }
 .animate-fade-in { animation: fade-in .25s ease-out; }
 .animate-pop-in { animation: pop-in .3s cubic-bezier(.2,.8,.2,1); }
+@keyframes hero-progress { from { width: 0; } to { width: 100%; } }
+.animate-hero-progress { animation: hero-progress linear forwards; }

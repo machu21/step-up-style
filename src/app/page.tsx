@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight, Quote, Star } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductRail, QuickViewButton } from "@/components/ProductRail";
 import { bestSellers, featured, newArrivals, peso, u } from "@/lib/products";
 
@@ -45,34 +46,7 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         {/* 2. Hero */}
-        <section className="relative isolate mx-auto mt-4 h-[88vh] min-h-[560px] max-w-[1400px] overflow-hidden px-4 sm:px-6">
-          <div className="relative h-full overflow-hidden rounded-[2rem] bg-ink">
-            <Image src={u("1556906781-9a412961c28c", 2000)} alt="Sneakers on a city street" fill priority sizes="100vw" className="object-cover opacity-90" />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 flex flex-col gap-8 p-6 sm:p-12 md:flex-row md:items-end md:justify-between">
-              <div className="text-cream">
-                <p className="mb-4 inline-block rounded-full border border-cream/30 px-3 py-1 text-xs uppercase tracking-widest">FW ’26 Collection</p>
-                <h1 className="display text-[19vw] sm:text-[12vw] lg:text-[10rem]">
-                  Driven by
-                  <br />
-                  Comfort
-                </h1>
-                <p className="mt-4 max-w-sm text-cream/75">Premium comfort in every step — streetwear silhouettes engineered for the way you move.</p>
-                <Link href="/shop" className="mt-6 inline-flex items-center gap-2 rounded-full bg-cream px-6 py-3 text-sm font-semibold text-ink transition hover:bg-ember hover:text-cream">
-                  Shop Collection <ArrowUpRight size={16} />
-                </Link>
-              </div>
-              <div className="max-w-[260px] rounded-2xl bg-cream/10 p-4 text-cream backdrop-blur-md">
-                <div className="flex -space-x-2">
-                  {[u("1494790108377-be9c29b29330", 80), u("1500648767791-00dcc994a43e", 80), u("1529156069898-49953e39b3ac", 80)].map((s) => (
-                    <Image key={s} src={s} alt="" width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-2 ring-ink" />
-                  ))}
-                </div>
-                <p className="mt-3 text-xs leading-relaxed text-cream/80">“The perfect combination of style and performance. They don’t leave my rotation.”</p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <HeroCarousel />
 
         {/* 3. Narrative banner */}
         <section className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6">
