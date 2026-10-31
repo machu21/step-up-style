@@ -1,9 +1,10 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowUpRight, Quote, Star } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductRail, QuickViewButton } from "@/components/ProductRail";
-import { bestSellers, featured, newArrivals, peso, products, u } from "@/lib/products";
+import { bestSellers, featured, newArrivals, peso, u } from "@/lib/products";
 
 function SectionTitle({ lead, accent, tail, sub }: { lead: string; accent: string; tail?: string; sub: string }) {
   return (
@@ -32,10 +33,10 @@ const REVIEWS = [
 ];
 
 const SPORTS = [
-  { label: "Built for the Hardwood", img: u("1546519638-68e109498ffc", 700), tone: "bg-cobalt" },
-  { label: "Own the Court", img: u("1554068865-24cecd4e34b8", 700), tone: "bg-olive" },
-  { label: "Run Further, Recover Faster", img: u("1571008887538-b36bb32f4571", 700), tone: "bg-ember" },
-  { label: "Gear Up for Match Day", img: u("1579952363873-27f3bade9f55", 700), tone: "bg-ink" },
+  { label: "Built for the Hardwood", href: "/shop?category=Basketball", img: u("1546519638-68e109498ffc", 700), tone: "bg-cobalt" },
+  { label: "Own the Court", href: "/shop?category=Casual", img: u("1554068865-24cecd4e34b8", 700), tone: "bg-olive" },
+  { label: "Run Further, Recover Faster", href: "/shop?category=Running", img: u("1571008887538-b36bb32f4571", 700), tone: "bg-ember" },
+  { label: "Gear Up for Match Day", href: "/shop?sort=rating", img: u("1579952363873-27f3bade9f55", 700), tone: "bg-ink" },
 ];
 
 export default function Home() {
@@ -57,9 +58,9 @@ export default function Home() {
                   Comfort
                 </h1>
                 <p className="mt-4 max-w-sm text-cream/75">Premium comfort in every step — streetwear silhouettes engineered for the way you move.</p>
-                <a href="#best-sellers" className="mt-6 inline-flex items-center gap-2 rounded-full bg-cream px-6 py-3 text-sm font-semibold text-ink transition hover:bg-ember hover:text-cream">
+                <Link href="/shop" className="mt-6 inline-flex items-center gap-2 rounded-full bg-cream px-6 py-3 text-sm font-semibold text-ink transition hover:bg-ember hover:text-cream">
                   Shop Collection <ArrowUpRight size={16} />
-                </a>
+                </Link>
               </div>
               <div className="max-w-[260px] rounded-2xl bg-cream/10 p-4 text-cream backdrop-blur-md">
                 <div className="flex -space-x-2">
@@ -120,7 +121,7 @@ export default function Home() {
         <section id="best-sellers" className="scroll-mt-20 bg-stone/40 py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <SectionTitle lead="Best" accent="Seller" sub="The pairs our community keeps coming back for. Tap any pair to pick your size." />
-            <ProductRail products={[...bestSellers, ...products.filter((p) => !bestSellers.includes(p))]} filterable />
+            <ProductRail products={bestSellers} viewAllHref="/shop?sort=rating" />
           </div>
         </section>
 
@@ -187,7 +188,7 @@ export default function Home() {
         <section className="bg-stone/40 py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <SectionTitle lead="New" accent="Arrivals" sub="Fresh off the line. Lock in your size before they’re gone." />
-            <ProductRail products={newArrivals} />
+            <ProductRail products={newArrivals} viewAllHref="/shop?sort=newest" />
           </div>
         </section>
 
@@ -227,14 +228,14 @@ export default function Home() {
           <SectionTitle lead="Engineered for" accent="Every" tail="Game" sub="A collection built for speed, strength and endurance — so you perform at your best in every sport." />
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {SPORTS.map((s, i) => (
-              <a key={s.label} href="#best-sellers" className={`group block ${i % 2 ? "lg:mt-10" : ""}`}>
+              <Link key={s.label} href={s.href} className={`group block ${i % 2 ? "lg:mt-10" : ""}`}>
                 <div className={`relative aspect-[3/4] overflow-hidden rounded-3xl ${s.tone}`}>
                   <Image src={s.img} alt={s.label} fill sizes="(min-width:1024px) 25vw, 50vw" className="object-cover transition duration-700 group-hover:scale-105" />
                 </div>
                 <p className="mt-3 flex items-center justify-between text-sm font-semibold">
                   {s.label} <ArrowUpRight size={16} className="transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </p>
-              </a>
+              </Link>
             ))}
           </div>
         </section>

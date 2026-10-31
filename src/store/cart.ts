@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Category, Product } from "@/lib/products";
+import type { Product } from "@/lib/products";
 
 export interface CartItem {
   key: string;
@@ -67,8 +67,6 @@ export const selectSubtotal = (s: CartState) => s.items.reduce((n, i) => n + i.p
 interface UiState {
   drawerOpen: boolean;
   quickViewId: string | null;
-  category: Category | "All";
-  setCategory: (c: Category | "All") => void;
   openDrawer: () => void;
   closeDrawer: () => void;
   openQuickView: (id: string) => void;
@@ -78,8 +76,6 @@ interface UiState {
 export const useUi = create<UiState>()((set) => ({
   drawerOpen: false,
   quickViewId: null,
-  category: "All",
-  setCategory: (category) => set({ category }),
   openDrawer: () => set({ drawerOpen: true, quickViewId: null }),
   closeDrawer: () => set({ drawerOpen: false }),
   openQuickView: (id) => set({ quickViewId: id }),

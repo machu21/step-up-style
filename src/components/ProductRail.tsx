@@ -1,17 +1,17 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRef } from "react";
-import { ChevronLeft, ChevronRight, Plus, Star } from "lucide-react";
-import { peso, type Category, type Product } from "@/lib/products";
+import { ArrowRight, ChevronLeft, ChevronRight, Plus, Star } from "lucide-react";
+import { peso, type Product } from "@/lib/products";
 import { useUi } from "@/store/cart";
 
-const FILTERS: (Category | "All")[] = ["All", "Running", "Casual", "Basketball"];
-
-export function ProductCard({ product }: { product: Product }) {
+/** `grid` drops the fixed mobile width used for horizontal scrolling rails. */
+export function ProductCard({ product, grid = false }: { product: Product; grid?: boolean }) {
   const openQuickView = useUi((s) => s.openQuickView);
   return (
-    <article className="group w-[78vw] shrink-0 snap-start sm:w-auto">
+    <article className={`group ${grid ? "" : "w-[78vw] shrink-0 snap-start sm:w-auto"}`}>
       <button
         onClick={() => openQuickView(product.id)}
         className="relative block aspect-square w-full overflow-hidden rounded-3xl bg-white text-left"
@@ -30,18 +30,18 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
         )}
         <span className="absolute bottom-3 right-3 flex translate-y-2 items-center gap-1 rounded-full bg-ink px-3 py-2 text-xs font-semibold text-cream opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100 max-sm:translate-y-0 max-sm:opacity-100">
-          <Plus size={14} /> Quick add
+          <Plus size={14} /> <span className={grid ? "max-sm:hidden" : ""}>Quick add</span>
         </span>
       </button>
-      <div className="mt-3 flex items-start justify-between gap-2 px-1">
-        <div>
+      <div className="mt-3 flex flex-wrap items-start justify-between gap-x-2 gap-y-1 px-1">
+        <div className="min-w-0">
           <h3 className="text-sm font-semibold">{product.name}</h3>
           <p className="text-xs text-muted">
-            {product.brand} · {product.category}
+            {product.gender} · {product.category}
           </p>
           <div className="mt-2 flex items-center gap-1.5">
             {product.colors.map((c) => (
-              <span key={c} className="h-3 w-3 rounded-full ring-1 ring-ink/15" style={{ background: c }} />
+              <span key={c.name} title={c.name} className="h-3 w-3 rounded-full ring-1 ring-ink/15" style={{ background: c.hex }} />
             ))}
             <span className="ml-2 flex items-center gap-0.5 text-xs text-muted">
               <Star size={11} className="fill-ember text-ember" /> {product.rating}
@@ -54,47 +54,30 @@ export function ProductCard({ product }: { product: Product }) {
   );
 }
 
-export function ProductRail({ products, filterable = false }: { products: Product[]; filterable?: boolean }) {
-  const { category, setCategory } = useUi();
+export function ProductRail({ products, viewAllHref }: { products: Product[]; viewAllHref?: string }) {
   const railRef = useRef<HTMLDivElement>(null);
-  const shown = filterable && category !== "All" ? products.filter((p) => p.category === category) : products;
-  const list = filterable && shown.length === 0 ? products : shown;
-
   const scroll = (dir: number) => railRef.current?.scrollBy({ left: dir * railRef.current.clientWidth * 0.8, behavior: "smooth" });
 
   return (
     <div>
-      {filterable && (
-        <div className="mb-8 flex flex-wrap justify-center gap-2">
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              onClick={() => setCategory(f)}
-              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
-                category === f ? "border-ink bg-ink text-cream" : "border-ink/15 hover:border-ink"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
-      )}
-      {filterable && shown.length === 0 && (
-        <p className="mb-6 text-center text-sm text-muted">No best sellers in {category} yet — here’s everything else.</p>
-      )}
       <div
         ref={railRef}
         className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4"
       >
-        {list.map((p) => (
+        {products.map((p) => (
           <ProductCard key={p.id} product={p} />
         ))}
       </div>
-      <div className="mt-6 flex justify-center gap-2 sm:hidden">
-        <button onClick={() => scroll(-1)} className="rounded-full border border-ink/20 p-2" aria-label="Previous">
+      <div className="mt-8 flex items-center justify-center gap-2">
+        <button onClick={() => scroll(-1)} className="rounded-full border border-ink/20 p-2 sm:hidden" aria-label="Previous">
           <ChevronLeft size={18} />
         </button>
-        <button onClick={() => scroll(1)} className="rounded-full bg-ink p-2 text-cream" aria-label="Next">
+        {viewAllHref && (
+          <Link href={viewAllHref} className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-cream transition hover:bg-ember">
+            View all <ArrowRight size={16} />
+          </Link>
+        )}
+        <button onClick={() => scroll(1)} className="rounded-full border border-ink/20 p-2 sm:hidden" aria-label="Next">
           <ChevronRight size={18} />
         </button>
       </div>

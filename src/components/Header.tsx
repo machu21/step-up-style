@@ -4,15 +4,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Menu, Search, ShoppingBag, X } from "lucide-react";
-import { products, peso, type Category } from "@/lib/products";
+import { products, peso } from "@/lib/products";
 import { selectCount, useCart, useUi } from "@/store/cart";
 import { Logo } from "./Logo";
 
-const CATEGORIES: Category[] = ["Running", "Casual", "Basketball"];
+const NAV = [
+  { label: "Shop All", href: "/shop" },
+  { label: "Men", href: "/shop?gender=Men" },
+  { label: "Women", href: "/shop?gender=Women" },
+  { label: "Running", href: "/shop?category=Running" },
+  { label: "Casual", href: "/shop?category=Casual" },
+  { label: "Basketball", href: "/shop?category=Basketball" },
+];
 
 export function Header() {
   const count = useCart(selectCount);
-  const { openDrawer, openQuickView, setCategory, category } = useUi();
+  const { openDrawer, openQuickView } = useUi();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -28,18 +35,12 @@ export function Header() {
       )
     : [];
 
-  const pickCategory = (c: Category) => {
-    setCategory(c);
-    setMenuOpen(false);
-    document.getElementById("best-sellers")?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <header className="sticky top-0 z-40 border-b border-ink/5 bg-cream/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-3">
           <button
-            className="rounded-full p-2 hover:bg-ink/5 md:hidden"
+            className="rounded-full p-2 hover:bg-ink/5 lg:hidden"
             aria-label="Open menu"
             onClick={() => setMenuOpen((v) => !v)}
           >
@@ -48,17 +49,15 @@ export function Header() {
           <Logo />
         </div>
 
-        <nav className="hidden items-center gap-1 rounded-full bg-ink/5 p-1 md:flex" aria-label="Categories">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c}
-              onClick={() => pickCategory(c)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-                category === c ? "bg-ink text-cream" : "text-ink/70 hover:text-ink"
-              }`}
+        <nav className="hidden items-center gap-1 rounded-full bg-ink/5 p-1 lg:flex" aria-label="Shop">
+          {NAV.map((n) => (
+            <Link
+              key={n.href}
+              href={n.href}
+              className="rounded-full px-4 py-1.5 text-sm font-medium text-ink/70 transition hover:bg-ink hover:text-cream"
             >
-              {c}
-            </button>
+              {n.label}
+            </Link>
           ))}
         </nav>
 
@@ -91,11 +90,11 @@ export function Header() {
       </div>
 
       {menuOpen && (
-        <nav className="flex gap-2 border-t border-ink/5 px-4 py-3 md:hidden" aria-label="Categories">
-          {CATEGORIES.map((c) => (
-            <button key={c} onClick={() => pickCategory(c)} className="rounded-full bg-ink/5 px-4 py-1.5 text-sm font-medium">
-              {c}
-            </button>
+        <nav className="flex flex-wrap gap-2 border-t border-ink/5 px-4 py-3 lg:hidden" aria-label="Shop">
+          {NAV.map((n) => (
+            <Link key={n.href} href={n.href} onClick={() => setMenuOpen(false)} className="rounded-full bg-ink/5 px-4 py-1.5 text-sm font-medium">
+              {n.label}
+            </Link>
           ))}
         </nav>
       )}

@@ -1,10 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, Check } from "lucide-react";
 
+const SHOP_LINKS = [
+  ["Shop All", "/shop"],
+  ["New Arrivals", "/shop?sort=newest"],
+  ["Men", "/shop?gender=Men"],
+  ["Women", "/shop?gender=Women"],
+  ["Basketball", "/shop?category=Basketball"],
+] as const;
+
 const COLUMNS = [
-  { title: "Shop", links: ["New Arrivals", "Best Sellers", "Running", "Casual", "Basketball"] },
   { title: "Support", links: ["Contact Us", "Size Guide", "Shipping & Delivery", "Returns", "FAQs"] },
   { title: "Social", links: ["Facebook", "Instagram", "TikTok"] },
 ];
@@ -51,7 +59,19 @@ export function Footer() {
           )}
           {state === "error" && <p className="mt-2 text-xs text-ember">Enter a valid email address.</p>}
         </div>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+          <div>
+            <p className="mb-4 text-sm font-semibold">Shop</p>
+            <ul className="space-y-2.5 text-sm text-cream/60">
+              {SHOP_LINKS.map(([label, href]) => (
+                <li key={href}>
+                  <Link href={href} className="hover:text-cream">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
           {COLUMNS.map((col) => (
             <div key={col.title}>
               <p className="mb-4 text-sm font-semibold">{col.title}</p>
